@@ -61,9 +61,17 @@ class AmazonAuthenticator extends OAuth2Authenticator implements AuthenticationE
                     return $existingUser;
                 }
 
+                $userName = $amazonUser->getName();
+                $nameParts = explode(" ", $userName);
+                $firstName = $nameParts[0];
+                $lastName = array_pop($nameParts);
+
                 $user = new User();
 
                 $user->setEmail($email);
+                $user->setFirstName($firstName);
+                $user->setLastName($lastName);
+                $user->setLastLogin(new \DateTime());
                 $user->setPassword($this->passwordHasher->hashPassword($user, random_bytes(10)));
                 $user->setSource('amazon');
                 $this->entityManager->persist($user);
@@ -76,6 +84,11 @@ class AmazonAuthenticator extends OAuth2Authenticator implements AuthenticationE
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $user = $token->getUser();
+        $user->setLastLogin(new \DateTime());
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
         // change "app_homepage" to some route in your app
         $targetUrl = $this->router->generate('app_login');
 
