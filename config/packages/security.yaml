@@ -24,11 +24,11 @@ security:
                 target: app_login
             custom_authenticator:
                 - App\Security\LoginFormAuthenticator
-                - App\Security\MyFacebookAuthenticator
-                - App\Security\MyAmazonAuthenticator
-                - App\Security\MyLinkedinAuthenticator
-                - App\Security\MyAzureAuthenticator
-                - App\Security\MyGoogleAuthenticator
+                - App\Security\CustomAuth\FacebookAuthenticator
+                - App\Security\CustomAuth\AmazonAuthenticator
+                - App\Security\CustomAuth\LinkedinAuthenticator
+                - App\Security\CustomAuth\AzureAuthenticator
+                - App\Security\CustomAuth\GoogleAuthenticator
             entry_point: App\Security\LoginFormAuthenticator
 
             # activate different ways to authenticate
