@@ -26,6 +26,7 @@ security:
                 - App\Security\LoginFormAuthenticator
                 - App\Security\MyFacebookAuthenticator
                 - App\Security\MyAmazonAuthenticator
+                - App\Security\MyLinkedinAuthenticator
             entry_point: App\Security\LoginFormAuthenticator
 
             # activate different ways to authenticate

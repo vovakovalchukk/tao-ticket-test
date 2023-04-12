@@ -23,3 +23,9 @@ knpu_oauth2_client:
             client_secret: '%env(OAUTH_AMAZON_CLIENT_SECRET)%'
             redirect_route: connect_amazon_check
             redirect_params: { }
+        linkedin_main:
+            type: linkedin
+            client_id: '%env(OAUTH_LINKEDIN_CLIENT_ID)%'
+            client_secret: '%env(OAUTH_LINKEDIN_CLIENT_SECRET)%'
+            redirect_route: connect_linkedin_check
+            redirect_params: { }
