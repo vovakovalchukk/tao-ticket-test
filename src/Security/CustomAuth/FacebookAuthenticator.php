@@ -19,28 +19,10 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
-class FacebookAuthenticator extends OAuth2Authenticator implements AuthenticationEntrypointInterface
+class FacebookAuthenticator extends BaseCustomAuthenticator
 {
-    private ClientRegistry $clientRegistry;
-    private EntityManagerInterface $entityManager;
-    private RouterInterface $router;
-    private UserPasswordHasherInterface $passwordHasher;
-
-    public function __construct(
-        ClientRegistry $clientRegistry,
-        EntityManagerInterface $entityManager,
-        RouterInterface $router,
-        UserPasswordHasherInterface $passwordHasher
-    ) {
-        $this->clientRegistry = $clientRegistry;
-        $this->entityManager = $entityManager;
-        $this->router = $router;
-        $this->passwordHasher = $passwordHasher;
-    }
-
     public function supports(Request $request): ?bool
     {
-        // continue ONLY if the current ROUTE matches the check ROUTE
         return $request->attributes->get('_route') === 'connect_facebook_check';
     }
 
@@ -70,46 +52,12 @@ class FacebookAuthenticator extends OAuth2Authenticator implements Authenticatio
                 $user->setLastLogin(new \DateTime());
                 $user->setPassword($this->passwordHasher->hashPassword($user, random_bytes(10)));
                 $user->setSource('facebook');
+
                 $this->entityManager->persist($user);
                 $this->entityManager->flush();
 
                 return $user;
             })
-        );
-    }
-
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
-        $user = $token->getUser();
-        $user->setLastLogin(new \DateTime());
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        // change "app_homepage" to some route in your app
-        $targetUrl = $this->router->generate('app_login');
-
-        return new RedirectResponse($targetUrl);
-
-        // or, on success, let the request continue to be handled by the controller
-        //return null;
-    }
-
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
-    {
-        $message = strtr($exception->getMessageKey(), $exception->getMessageData());
-
-        return new Response($message, Response::HTTP_FORBIDDEN);
-    }
-
-    /**
-     * Called when authentication is needed, but it's not sent.
-     * This redirects to the 'login'.
-     */
-    public function start(Request $request, AuthenticationException $authException = null): Response
-    {
-        return new RedirectResponse(
-            '/connect/', // might be the site, where users choose their oauth provider
-            Response::HTTP_TEMPORARY_REDIRECT
         );
     }
 }
