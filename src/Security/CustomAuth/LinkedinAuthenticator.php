@@ -64,6 +64,9 @@ class LinkedinAuthenticator extends OAuth2Authenticator implements Authenticatio
                 $user = new User();
 
                 $user->setEmail($email);
+                $user->setFirstName($linkedinUser->getFirstName());
+                $user->setLastName($linkedinUser->getLastName());
+                $user->setLastLogin(new \DateTime());
                 $user->setPassword($this->passwordHasher->hashPassword($user, random_bytes(10)));
                 $user->setSource('linkedin');
                 $this->entityManager->persist($user);
@@ -76,6 +79,11 @@ class LinkedinAuthenticator extends OAuth2Authenticator implements Authenticatio
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        $user = $token->getUser();
+        $user->setLastLogin(new \DateTime());
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+
         // change "app_homepage" to some route in your app
         $targetUrl = $this->router->generate('app_login');
 
