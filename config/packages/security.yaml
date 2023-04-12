@@ -28,6 +28,7 @@ security:
                 - App\Security\MyAmazonAuthenticator
                 - App\Security\MyLinkedinAuthenticator
                 - App\Security\MyAzureAuthenticator
+                - App\Security\MyGoogleAuthenticator
             entry_point: App\Security\LoginFormAuthenticator
 
             # activate different ways to authenticate
