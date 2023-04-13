@@ -2,24 +2,14 @@
 
 namespace App\Security\CustomAuth;
 
-use App\Entity\User;
-use Doctrine\ORM\EntityManagerInterface;
-use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
-use KnpU\OAuth2ClientBundle\Security\Authenticator\OAuth2Authenticator;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\RouterInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
-use Symfony\Component\Security\Http\EntryPoint\AuthenticationEntryPointInterface;
 
 class GoogleAuthenticator extends BaseCustomAuthenticator
 {
+    private string $source = 'google';
     public function supports(Request $request): ?bool
     {
         return $request->attributes->get('_route') === 'connect_google_check';
@@ -36,25 +26,18 @@ class GoogleAuthenticator extends BaseCustomAuthenticator
                 $googleUser = $client->fetchUserFromToken($accessToken)->toArray();
                 $email = $googleUser['email'];
 
-                $existingUser = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email, 'source' => 'google']);
+                $existingUser = $this->userRepository->findOneBy(['email' => $email, 'source' => $this->source]);
 
                 if ($existingUser) {
                     return $existingUser;
                 }
 
-                $user = new User();
-
-                $user->setEmail($email);
-                $user->setFirstName($googleUser['given_name']);
-                $user->setLastName($googleUser['family_name']);
-                $user->setLastLogin(new \DateTime());
-                $user->setPassword($this->passwordHasher->hashPassword($user, random_bytes(10)));
-                $user->setSource('google');
-
-                $this->entityManager->persist($user);
-                $this->entityManager->flush();
-
-                return $user;
+                return $this->userRepository->createFromCustomAuth([
+                    'email' => $email,
+                    'first_name' => $googleUser['given_name'],
+                    'last_name' => $googleUser['family_name'],
+                    'source' => $this->source
+                ]);
             })
         );
     }
