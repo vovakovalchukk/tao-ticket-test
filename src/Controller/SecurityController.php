@@ -2,9 +2,6 @@
 
 namespace App\Controller;
 
-use Exception;
-use Symfony\Component\HttpFoundation\Request;
-use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
