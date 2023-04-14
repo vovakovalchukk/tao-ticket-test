@@ -29,6 +29,7 @@ security:
                 - App\Security\CustomAuth\LinkedinAuthenticator
                 - App\Security\CustomAuth\AzureAuthenticator
                 - App\Security\CustomAuth\GoogleAuthenticator
+                - App\Security\CustomAuth\GoogleOneTapAuthentificator
             entry_point: App\Security\LoginFormAuthenticator
 
             # activate different ways to authenticate

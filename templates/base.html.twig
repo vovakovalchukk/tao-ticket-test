@@ -12,7 +12,18 @@
         {% block javascripts %}
             {{ encore_entry_script_tags('app') }}
         {% endblock %}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
     </head>
+
+    {% if not app.user %}
+        <div id="g_id_onload"
+             data-client_id="349862717094-r90vvt4akctkjjglt0f0bvc9kpde7o8d.apps.googleusercontent.com"
+             data-context="signin"
+             data-login_uri="/connect/google-one-tap/check"
+             data-itp_support="true">
+        </div>
+    {% endif %}
+
     <body>
         {% block body %}{% endblock %}
     </body>
